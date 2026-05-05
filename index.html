@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Infinity & Beyond | Our 1st Anniversary</title>
+    
+    <!-- External Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/TextPlugin.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Great+Vibes&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --gold: #d4af37;
+            --rose: #ff4d6d;
+            --glass: rgba(255, 255, 255, 0.08);
+            --text: #ffffff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: #0a0a0a;
+            color: var(--text);
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+            cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" style="fill:red;"><path d="M10 18l-1.45-1.32C3.4 12.36 0 9.28 0 5.5 0 2.42 2.42 0 5.5 0 7.24 0 8.91.81 10 2.09 11.09.81 12.76 0 14.5 0 17.58 0 20 2.42 20 5.50 20 9.28 16.6 12.36 11.45 16.68L10 18z"/></svg>'), auto;
+        }
+
+        /* Canvas Background */
+        #heartCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+
+        /* Section Global Styling */
+        section {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            opacity: 0;
+            visibility: hidden;
+            transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .glass-card {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 3rem;
+            border-radius: 30px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+        }
+
+        /* Love Counter Styling */
+        .counter-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .counter-item {
+            background: rgba(255,255,255,0.1);
+            padding: 10px;
+            border-radius: 10px;
+            border: 1px solid var(--gold);
+        }
+
+        .counter-item span {
+            display: block;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--gold);
+        }
+
+        .counter-item label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+        }
+
+        /* Buttons */
+        .btn-main {
+            background: linear-gradient(45deg, #d4af37, #f9e29c);
+            color: #000;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s;
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
+            text-transform: uppercase;
+        }
+
+        .btn-main:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 0 30px var(--gold);
+        }
+
+        /* Polaroid Stack */
+        .polaroid-stack {
+            position: relative;
+            width: 300px;
+            height: 380px;
+        }
+
+        .polaroid {
+            position: absolute;
+            background: white;
+            padding: 15px 15px 50px 15px;
+            width: 100%;
+            height: 100%;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            cursor: pointer;
+            transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        .polaroid img { width: 100%; height: 100%; object-fit: cover; }
+        .polaroid p { color: #333; font-family: 'Dancing Script', cursive; font-size: 1.5rem; margin-top: 10px; }
+
+        /* Music Controls */
+        #music-btn {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: var(--glass);
+            border: 1px solid var(--gold);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Heart Animation */
+        .heart-loader {
+            font-size: 100px;
+            animation: pulse 1.5s infinite;
+            filter: drop-shadow(0 0 20px var(--rose));
+            cursor: pointer;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        /* No Button Fun */
+        #no-btn {
+            position: absolute;
+            z-index: 100;
+        }
+
+    </style>
+</head>
+<body>
+
+    <canvas id="heartCanvas"></canvas>
+    
+    <button id="music-btn">🎵</button>
+    <audio id="bg-music" loop>
+        <source src="https://www.chosic.com/wp-content/uploads/2021/07/Rainy-Day-Emotional-Piano-Music.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- SECTION 1: THE START -->
+    <section id="s1" class="active">
+        <div class="heart-loader" id="start-trigger">❤️</div>
+        <h1 id="intro-text" style="margin-top: 30px; font-family: 'Great Vibes', cursive; font-size: 3rem;"></h1>
+        <p id="sub-text" style="opacity: 0;"></p>
+    </section>
+
+    <!-- SECTION 2: LOVE COUNTER -->
+    <section id="s2">
+        <div class="glass-card">
+            <h2 style="font-family: 'Great Vibes', cursive; font-size: 2.5rem;">We have been together for...</h2>
+            <div class="counter-grid">
+                <div class="counter-item"><span id="days">00</span><label>Days</label></div>
+                <div class="counter-item"><span id="hours">00</span><label>Hrs</label></div>
+                <div class="counter-item"><span id="mins">00</span><label>Mins</label></div>
+                <div class="counter-item"><span id="secs">00</span><label>Secs</label></div>
+            </div>
+            <p>Every second with you is a blessing.</p>
+            <button class="btn-main" onclick="nextSection('s3')">See Our Journey</button>
+        </div>
+    </section>
+
+    <!-- SECTION 3: THE GAME -->
+    <section id="s3">
+        <div class="glass-card" style="position: relative; height: 400px;">
+            <h2 style="margin-bottom: 20px;">Be honest...</h2>
+            <p>Do you love me more than I love you? 🤨</p>
+            <div style="margin-top: 50px;">
+                <button class="btn-main" id="yes-btn">Yes, I do! ❤️</button>
+                <button class="btn-main" id="no-btn" style="background: #444; color: #fff;">No 🤡</button>
+            </div>
+            <p id="game-feedback" style="margin-top: 40px; color: var(--gold);"></p>
+        </div>
+    </section>
+
+    <!-- SECTION 4: POLAROID GALLERY -->
+    <section id="s4">
+        <h2 style="font-family: 'Great Vibes', cursive; font-size: 3rem; margin-bottom: 20px;">tap on photos to throw them away</h2>
+        <div class="polaroid-stack">
+            <!-- You can replace these image URLs with your own -->
+            <div class="polaroid" style="transform: rotate(-5deg); z-index: 3;">
+                <img src="img03.jpg" alt="Memory 1">
+                <p>Where it all began...</p>
+            </div>
+            <div class="polaroid" style="transform: rotate(5deg); z-index: 2;">
+                <img src="img02.jpg" alt="Memory 2">
+                <p>Your beautiful smile 😊</p>
+            </div>
+            <div class="polaroid" style="transform: rotate(-2deg); z-index: 1;">
+                <img src="img01.jpg" alt="Memory 3">
+                <p>Forever to go! 🥂</p>
+            </div
+        </div>
+        <p style="margin-top: 40px; font-style: italic;"></p>
+        <button class="btn-main" id="gallery-next" style="display: none;" onclick="nextSection('s5')">Read My Letter</button>
+    </section>
+
+    <!-- SECTION 5: EMOTIONAL LETTER -->
+    <section id="s5">
+        <div class="glass-card" style="max-width: 600px; text-align: left;">
+            <div id="letter-content" style="font-size: 1.1rem; line-height: 1.8; font-style: italic;"></div>
+            <button class="btn-main" id="final-btn" style="display: none; width: 100%;" onclick="nextSection('s6')">Ready for the Surprise?</button>
+        </div>
+    </section>
+
+    <!-- SECTION 6: FINAL ANNIVERSARY -->
+    <section id="s6">
+        <div class="glass-card" style="border: 2px solid var(--gold); background: rgba(0,0,0,0.8);">
+            <h1 style="font-family: 'Dancing Script', cursive; font-size: 4rem; color: var(--gold);">Happy 1st Anniversary!</h1>
+            <p style="margin: 20px 0; font-size: 1.2rem;">I promise to love you more with every passing sunset.</p>
+            <div class="heart-loader">💍</div>
+            <p style="margin-top: 20px; font-weight: bold; letter-spacing: 2px;">YOU ARE MY FOREVER ❤️</p>
+            <button class="btn-main" onclick="location.reload()" style="font-size: 0.7rem; padding: 10px 20px;">Relive Our Story</button>
+        </div>
+    </section>
+
+    <script>
+        gsap.registerPlugin(TextPlugin);
+
+        // --- 1. CONFIGURATION & BACKGROUND ---
+        const anniversaryDate = new Date("2023-05-20T00:00:00"); // 👈 APNI ANNIVERSARY DATE YAHAN DAALEIN
+        const canvas = document.getElementById('heartCanvas');
+        const ctx = canvas.getContext('2d');
+        let hearts = [];
+
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        class Heart {
+            constructor() { this.reset(); }
+            reset() {
+                this.x = Math.random() * canvas.width;
+                this.y = canvas.height + 20;
+                this.size = Math.random() * 15 + 5;
+                this.speed = Math.random() * 1.5 + 0.5;
+                this.opacity = Math.random() * 0.5;
+            }
+            update() {
+                this.y -= this.speed;
+                if (this.y < -20) this.reset();
+            }
+            draw() {
+                ctx.fillStyle = `rgba(255, 77, 109, ${this.opacity})`;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        for(let i=0; i<50; i++) hearts.push(new Heart());
+        function animate() {
+            ctx.clearRect(0,0,canvas.width, canvas.height);
+            hearts.forEach(h => { h.update(); h.draw(); });
+            requestAnimationFrame(animate);
+        }
+        animate();
+
+        // --- 2. MUSIC CONTROL ---
+        const music = document.getElementById('bg-music');
+        const mBtn = document.getElementById('music-btn');
+        mBtn.onclick = () => {
+            if(music.paused) { music.play(); mBtn.innerText = '⏸️'; }
+            else { music.pause(); mBtn.innerText = '🎵'; }
+        };
+
+        // --- 3. NAVIGATION ---
+        function nextSection(id) {
+            gsap.to(".active", { opacity: 0, scale: 0.8, duration: 0.8, onComplete: () => {
+                document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
+                const next = document.getElementById(id);
+                next.classList.add('active');
+                gsap.fromTo(next, { opacity: 0, scale: 1.2 }, { opacity: 1, scale: 1, duration: 0.8 });
+                
+                if(id === 's5') startLetter();
+                if(id === 's6') startFireworks();
+            }});
+        }
+
+        // --- 4. SECTION 1 LOGIC ---
+        document.getElementById('start-trigger').onclick = () => {
+            music.play();
+            mBtn.innerText = '⏸️';
+            gsap.to("#intro-text", { duration: 2, text: "Happy Anniversary, My Love!" });
+            gsap.to("#sub-text", { delay: 2, opacity: 1, text: "Ready to see something special?", duration: 2 });
+            setTimeout(() => nextSection('s2'), 5000);
+        };
+
+        // --- 5. LOVE COUNTER LOGIC ---
+        function updateCounter() {
+            const now = new Date();
+            const diff = now - anniversaryDate;
+            const d = Math.floor(diff / (1000*60*60*24));
+            const h = Math.floor((diff / (1000*60*60)) % 24);
+            const m = Math.floor((diff / (1000*60)) % 60);
+            const s = Math.floor((diff / 1000) % 60);
+            document.getElementById('days').innerText = d;
+            document.getElementById('hours').innerText = h;
+            document.getElementById('mins').innerText = m;
+            document.getElementById('secs').innerText = s;
+        }
+        setInterval(updateCounter, 1000);
+
+        // --- 6. NO BUTTON GAME ---
+        const noBtn = document.getElementById('no-btn');
+        noBtn.onmouseover = () => {
+            const x = Math.random() * (window.innerWidth - 150);
+            const y = Math.random() * (window.innerHeight - 150);
+            gsap.to(noBtn, { left: x, top: y, duration: 0.3 });
+            document.getElementById('game-feedback').innerText = "Wrong answer! Try again! 😂";
+        };
+        document.getElementById('yes-btn').onclick = () => {
+            confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+            document.getElementById('game-feedback').innerText = "I knew it! ❤️ Let's go!";
+            setTimeout(() => nextSection('s4'), 2000);
+        };
+
+        // --- 7. POLAROID STACK ---
+        let polaroids = document.querySelectorAll('.polaroid');
+        let count = 0;
+        polaroids.forEach(p => {
+            p.onclick = () => {
+                gsap.to(p, { y: -1000, rotate: 45, opacity: 0, duration: 1 });
+                count++;
+                if(count === polaroids.length) {
+                    document.getElementById('gallery-next').style.display = 'inline-block';
+                    gsap.from('#gallery-next', { opacity: 0, y: 20 });
+                }
+            };
+        });
+
+        // --- 8. THE LETTER ---
+        function startLetter() {
+            const text = "To the one who holds my heart,<br><br>It's been 365 days of laughter, support, and endless love. From our first date to this very moment, you have made my life complete. Thank you for being my home, my peace, and my everything.<br><br>I love you forever.";
+            gsap.to("#letter-content", {
+                duration: 10,
+                text: text,
+                ease: "none",
+                onComplete: () => {
+                    gsap.to("#final-btn", { display: 'block', opacity: 1, duration: 1 });
+                }
+            });
+        }
+
+        // --- 9. FIREWORKS ---
+        function startFireworks() {
+            var duration = 15 * 1000;
+            var animationEnd = Date.now() + duration;
+            var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+
+            function randomInRange(min, max) { return Math.random() * (max - min) + min; }
+
+            var interval = setInterval(function() {
+                var timeLeft = animationEnd - Date.now();
+                if (timeLeft <= 0) return clearInterval(interval);
+                var particleCount = 50 * (timeLeft / duration);
+                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
+                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
+            }, 250);
+        }
+    </script>
+</body>
+</html>
